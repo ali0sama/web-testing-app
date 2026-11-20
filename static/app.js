@@ -102,6 +102,9 @@ function showInspection(inspection) {
     `Inspection #${inspection.id} | ${inspection.title} | ${inspection.final_url} | ` +
     `scope: ${inspection.scope || "whole page"} | ${inspection.element_count} elements ` +
     `(${inspection.hidden_skipped || 0} hidden skipped) | ${inspection.created_at} | DOM hash ${(inspection.dom_hash || "").slice(0, 12)}`;
+  $("browser-timing").textContent =
+    `Browser/runner time (separate from model time): page load ${inspection.load_ms} ms, ` +
+    `inspection + locator checks ${inspection.inspect_ms} ms`;
   $("export-link").href = `/api/inspections/${inspection.id}/export`;
   $("screenshot-link").href = `/api/inspections/${inspection.id}/screenshot`;
   renderElements();

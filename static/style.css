@@ -31,6 +31,7 @@ button:disabled { opacity: 0.5; cursor: wait; }
 .small { font-size: 12px; }
 .meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
 .status { margin-top: 6px; font-size: 13px; }
+.timing { font-size: 13px; font-weight: 600; color: #1e40af; background: #eef4ff; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
 .status.error { color: var(--bad); }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
