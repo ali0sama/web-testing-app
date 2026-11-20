@@ -1,0 +1,36 @@
+flowchart TB
+    subgraph UI["Web UI (static HTML/JS)"]
+        direction LR
+        A1[URL, scope, goal inputs]
+        A2[Findings table + selection]
+        A3[Prompt preview + Approve]
+        A4[Model usage panel]
+    end
+
+    subgraph CORE["Core app (FastAPI, Python)"]
+        B1[API routes<br/>app/main.py]
+        B2[URL allowlist<br/>app/config.py]
+        B3[Runner client<br/>app/runner_client.py]
+        B4[Assistant + validator<br/>app/assistant.py]
+        B5[LLM client<br/>app/llm/client.py]
+        B6[(Storage<br/>SQLite + PNG<br/>app/storage.py)]
+    end
+
+    subgraph RUN["Isolated runner process"]
+        direction LR
+        C1[worker.py<br/>fixed command set]
+        C2[Visible Chromium<br/>Playwright]
+        C3[extract_elements.js<br/>read-only]
+    end
+
+    LLM[(Groq free tier<br/>openai/gpt-oss-120b<br/>or local Ollama)]
+    WEB[(Target website)]
+
+    UI -- REST/JSON --> B1
+    B1 --> B2 --> B3
+    B3 -- JSON lines stdin/stdout --> C1
+    C1 --> C2 -- navigate allowed host only --> WEB
+    C2 --> C3
+    B1 --> B6
+    B1 --> B4 --> B5 -- HTTPS --> LLM
+    B4 --> B6

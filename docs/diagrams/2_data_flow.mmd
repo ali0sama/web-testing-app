@@ -1,0 +1,30 @@
+sequenceDiagram
+    actor T as Tester
+    participant UI
+    participant API as Core app
+    participant R as Runner (separate process)
+    participant DB as SQLite
+    participant M as Model (Groq)
+
+    T->>UI: URL, optional scope, Open & Inspect
+    UI->>API: POST /api/inspect
+    API->>API: allowlist check (host must be allowed)
+    API->>R: open {url}
+    R-->>API: final_url, title, load_ms
+    API->>R: inspect {scope, include_hidden}
+    R->>R: extract elements, build locators, count() each locator live
+    R-->>API: elements + locator status, DOM hash, screenshot
+    API->>DB: save inspection + elements (E001...)
+    API-->>UI: findings
+    T->>UI: select elements, Highlight (shown in real browser)
+    T->>UI: write testing goal, Preview
+    UI->>API: POST /api/assist/preview
+    API-->>UI: exact messages + preview_hash (APPROVAL GATE G1)
+    T->>UI: Approve & send
+    UI->>API: POST /api/assist {approved_preview_hash}
+    API->>API: rebuild prompt, hash must match
+    API->>M: chat completion (JSON mode)
+    M-->>API: summary, next_actions, assumptions, questions + token usage
+    API->>API: validate element_ids exist and attach OBSERVED locator
+    API->>DB: save model call (tokens, latency, source)
+    API-->>UI: result + validation issues + metrics

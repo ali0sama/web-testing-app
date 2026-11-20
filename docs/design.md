@@ -24,42 +24,9 @@ Phase 1 delivers the architecture and a working prototype of the first stage, **
 
 ## 2. Component diagram
 
-```mermaid
-flowchart LR
-    subgraph UI["Web UI (static HTML/JS)"]
-        A1[URL, scope, goal inputs]
-        A2[Findings table + selection]
-        A3[Prompt preview + Approve]
-        A4[Model usage panel]
-    end
+![Component diagram](images/1_component_diagram.png)
 
-    subgraph CORE["Core app (FastAPI, Python)"]
-        B1[API routes<br/>app/main.py]
-        B2[URL allowlist<br/>app/config.py]
-        B3[Runner client<br/>app/runner_client.py]
-        B4[Assistant + validator<br/>app/assistant.py]
-        B5[LLM client<br/>app/llm/client.py]
-        B6[(Storage<br/>SQLite + PNG<br/>app/storage.py)]
-    end
-
-    subgraph RUN["Isolated runner process"]
-        C1[worker.py<br/>fixed command set]
-        C2[Visible Chromium<br/>Playwright]
-        C3[extract_elements.js<br/>read-only]
-    end
-
-    LLM[(Groq free tier<br/>openai/gpt-oss-120b<br/>or local Ollama)]
-    WEB[(Target website)]
-
-    UI -- REST/JSON --> B1
-    B1 --> B2 --> B3
-    B3 -- JSON lines stdin/stdout --> C1
-    C1 --> C2 -- navigate allowed host only --> WEB
-    C2 --> C3
-    B1 --> B6
-    B1 --> B4 --> B5 -- HTTPS --> LLM
-    B4 --> B6
-```
+*Source: `docs/diagrams/1_component_diagram.mmd`. Re-render with `python docs/render_diagrams.py`.*
 
 | Component | Responsibility | Files |
 |---|---|---|
@@ -76,38 +43,9 @@ flowchart LR
 
 ## 3. Data flow (Phase 1)
 
-```mermaid
-sequenceDiagram
-    actor T as Tester
-    participant UI
-    participant API as Core app
-    participant R as Runner (separate process)
-    participant DB as SQLite
-    participant M as Model (Groq)
+![Phase 1 data flow](images/2_data_flow.png)
 
-    T->>UI: URL, optional scope, Open & Inspect
-    UI->>API: POST /api/inspect
-    API->>API: allowlist check (host must be allowed)
-    API->>R: open {url}
-    R-->>API: final_url, title, load_ms
-    API->>R: inspect {scope, include_hidden}
-    R->>R: extract elements, build locators, count() each locator live
-    R-->>API: elements + locator status, DOM hash, screenshot
-    API->>DB: save inspection + elements (E001...)
-    API-->>UI: findings
-    T->>UI: select elements, Highlight (shown in real browser)
-    T->>UI: write testing goal, Preview
-    UI->>API: POST /api/assist/preview
-    API-->>UI: exact messages + preview_hash  (APPROVAL GATE G1)
-    T->>UI: Approve & send
-    UI->>API: POST /api/assist {approved_preview_hash}
-    API->>API: rebuild prompt, hash must match
-    API->>M: chat completion (JSON mode)
-    M-->>API: summary, next_actions, assumptions, questions + token usage
-    API->>API: validate element_ids exist and attach OBSERVED locator
-    API->>DB: save model call (tokens, latency, source)
-    API-->>UI: result + validation issues + metrics
-```
+*Source: `docs/diagrams/2_data_flow.mmd`.*
 
 ### Inspection record (stored)
 
