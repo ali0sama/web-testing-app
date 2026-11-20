@@ -72,6 +72,9 @@ def inspect_page(request: InspectRequest):
             "screenshot_name": screenshot_name,
         })
     except RunnerError as exc:
+        if exc.error_type == "ScopeError":
+            # The tester's scope selector is wrong: a user input error, not a server failure.
+            raise HTTPException(400, str(exc).removeprefix("ScopeError: "))
         raise HTTPException(502, f"Browser runner error: {exc}")
     inspection_id = storage.save_inspection(SESSION_ID, url, request.include_hidden, opened, result)
     inspection = storage.get_inspection(inspection_id)
@@ -127,8 +130,11 @@ def highlight(request: HighlightRequest):
         if locator is None:
             raise HTTPException(409, "This element has no unique locator to highlight")
     try:
-        return runner.call("highlight", {"locator": locator}, timeout=20)
+        return runner.call("highlight", {"locator": locator, "expected_url": inspection["final_url"]}, timeout=20)
     except RunnerError as exc:
+        if exc.error_type == "WrongPageError":
+            raise HTTPException(409, str(exc).removeprefix("WrongPageError: ") +
+                                ". Re-open that page with Open & Inspect before highlighting.")
         raise HTTPException(502, f"Could not highlight (is the page still open?): {exc}")
 
 
@@ -162,3 +168,12 @@ def model_calls():
         "session": storage.session_stats(SESSION_ID),
         "calls": storage.list_model_calls(),
     }
+
+
+@app.get("/api/model-calls/{call_id}")
+def model_call_detail(call_id: int):
+    """Full record of one call: exact prompt sent, raw response, validated result."""
+    call = storage.get_model_call(call_id)
+    if call is None:
+        raise HTTPException(404, f"Model call {call_id} not found")
+    return call

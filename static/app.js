@@ -107,6 +107,12 @@ function showInspection(inspection) {
     `inspection + locator checks ${inspection.inspect_ms} ms`;
   $("export-link").href = `/api/inspections/${inspection.id}/export`;
   $("screenshot-link").href = `/api/inspections/${inspection.id}/screenshot`;
+  const pageText = inspection.page_text || [];
+  $("page-text-summary").textContent = `Visible page text (${pageText.length} block(s), sent to the model as data)`;
+  const textList = $("page-text-list");
+  textList.textContent = "";
+  if (!pageText.length) textList.appendChild(el("li", "(none captured)", "muted"));
+  for (const block of pageText) textList.appendChild(el("li", `${block.text_id} <${block.tag}>: ${block.text}`));
   renderElements();
 }
 
@@ -277,7 +283,17 @@ function showResult(response) {
     locCell.appendChild(el("code", action.observed_locator || "-"));
     row.appendChild(locCell);
     row.appendChild(el("td", action.reason));
-    row.appendChild(el("td", action.test_data_hint));
+    const dataCell = el("td");
+    if (action.test_data_hint) {
+      dataCell.appendChild(el("div", action.test_data_hint));
+      const source = action.test_data_source;
+      const sourceText = {
+        goal: "from your goal", page_text: "seen on the page",
+        placeholder: "placeholder: you provide it", unverified: "NOT observed, confirm it",
+      }[source] || source;
+      dataCell.appendChild(el("div", sourceText, "small " + (source === "unverified" ? "no" : "muted")));
+    }
+    row.appendChild(dataCell);
     body.appendChild(row);
   }
   fillList("assumptions", result.assumptions);
@@ -307,6 +323,12 @@ async function loadCalls() {
       call.latency_ms != null ? call.latency_ms + " ms" : "-",
     ].forEach((value) => row.appendChild(el("td", value)));
     row.appendChild(el("td", call.ok ? "ok" : "failed: " + call.error, call.ok ? "yes" : "no"));
+    const detailCell = el("td");
+    const detailLink = el("a", "prompt + response");
+    detailLink.href = `/api/model-calls/${call.id}`;
+    detailLink.target = "_blank";
+    detailCell.appendChild(detailLink);
+    row.appendChild(detailCell);
     body.appendChild(row);
   }
 }

@@ -73,9 +73,28 @@ def as_text_list(value) -> list[str]:
     return []
 
 
-def validate_response(data: dict, inspection: dict, selected_ids: list[str]) -> dict:
+def test_data_source(hint: str, goal: str, inspection: dict) -> str:
+    """Where a suggested test value comes from:
+    'goal' / 'page_text' = found there (grounded), 'placeholder' = <...> the
+    tester must fill in, 'unverified' = not observed anywhere (model knowledge
+    or invention), '' = no test data."""
+    hint = hint.strip()
+    if not hint:
+        return ""
+    if hint.startswith("<") and hint.endswith(">"):
+        return "placeholder"
+    needle = hint.lower()
+    if needle in goal.lower():
+        return "goal"
+    if any(needle in block.get("text", "").lower() for block in inspection.get("page_text") or []):
+        return "page_text"
+    return "unverified"
+
+
+def validate_response(data: dict, inspection: dict, selected_ids: list[str], goal: str = "") -> dict:
     """Mark every suggested action as grounded (element was observed) or not,
-    and attach the OBSERVED locator instead of trusting any model-made one."""
+    attach the OBSERVED locator instead of trusting any model-made one, and
+    check that suggested test data was actually observed or given by the tester."""
     elements_by_id = {e["element_id"]: e for e in inspection["elements"]}
     selected = set(selected_ids)
     issues = []
@@ -85,11 +104,13 @@ def validate_response(data: dict, inspection: dict, selected_ids: list[str]) -> 
             continue
         element_id = str(item.get("element_id", "")).strip()
         element = elements_by_id.get(element_id)
+        hint = str(item.get("test_data_hint", "") or "")
         action = {
             "element_id": element_id,
             "action": str(item.get("action", "")),
             "reason": str(item.get("reason", "")),
-            "test_data_hint": str(item.get("test_data_hint", "") or ""),
+            "test_data_hint": hint,
+            "test_data_source": test_data_source(hint, goal, inspection),
             "grounded": element is not None,
             "in_selection": element_id in selected,
             "observed_locator": element.get("recommended_locator") if element else None,
@@ -100,6 +121,9 @@ def validate_response(data: dict, inspection: dict, selected_ids: list[str]) -> 
             issues.append(f"'{element_id}' was observed but is outside your selection.")
         elif not action["observed_locator"]:
             issues.append(f"'{element_id}' has no unique locator; it needs a better locator before testing.")
+        if action["test_data_source"] == "unverified":
+            issues.append(f"Test data '{hint}' for '{element_id}' is not in your goal or the observed page text; "
+                          "confirm it before using it.")
         actions.append(action)
     return {
         "summary": str(data.get("summary", "")),
@@ -126,7 +150,7 @@ def run_assist(session_id: str, inspection: dict, element_ids: list[str], goal: 
     try:
         result = chat(preview["messages"])
     except LLMError as exc:
-        storage.save_model_call({**base_record, "ok": False, "error": str(exc)})
+        storage.save_model_call({**base_record, "ok": False, "error": str(exc)}, messages=preview["messages"])
         raise
 
     record = {
@@ -139,13 +163,14 @@ def run_assist(session_id: str, inspection: dict, element_ids: list[str], goal: 
         "latency_ms": result.latency_ms,
         "ok": True,
     }
-    record["id"] = storage.save_model_call(record)
+    record["id"] = storage.save_model_call(record, messages=preview["messages"], response_text=result.text)
 
     try:
-        validated = validate_response(parse_model_json(result.text), inspection, preview["element_ids"])
+        validated = validate_response(parse_model_json(result.text), inspection, preview["element_ids"], goal)
     except (json.JSONDecodeError, AttributeError):
         validated = {
             "summary": "", "next_actions": [], "assumptions": [], "clarifying_questions": [],
             "validation_issues": ["The model did not return valid JSON. Raw text is shown below."],
         }
+    storage.save_model_call_result(record["id"], validated)
     return {"call": record, "result": validated, "raw_text": result.text}

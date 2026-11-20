@@ -40,6 +40,7 @@
     <h2>2. Findings</h2>
     <div id="inspection-meta" class="meta"></div>
     <div id="browser-timing" class="timing"></div>
+    <details id="page-text"><summary id="page-text-summary">Visible page text</summary><ul id="page-text-list" class="small"></ul></details>
     <div class="row">
       <input id="filter" type="text" placeholder="Filter by text, role, id...">
       <button id="select-all">Select shown</button>
@@ -85,7 +86,7 @@
     <p id="result-summary"></p>
     <h3>Suggested next actions</h3>
     <table>
-      <thead><tr><th>Element</th><th>Grounded?</th><th>Action</th><th>Observed locator</th><th>Reason</th><th>Test data hint</th></tr></thead>
+      <thead><tr><th>Element</th><th>Grounded?</th><th>Action</th><th>Observed locator</th><th>Reason</th><th>Test data (source)</th></tr></thead>
       <tbody id="actions-body"></tbody>
     </table>
     <div class="two-col">
@@ -102,7 +103,7 @@
     <div id="session-stats" class="meta"></div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Time (UTC)</th><th>Provider / model</th><th>Prompt tok</th><th>Completion tok</th><th>Total</th><th>Token source</th><th>Response time</th><th>Status</th></tr></thead>
+        <thead><tr><th>#</th><th>Time (UTC)</th><th>Provider / model</th><th>Prompt tok</th><th>Completion tok</th><th>Total</th><th>Token source</th><th>Response time</th><th>Status</th><th>Details</th></tr></thead>
         <tbody id="calls-body"></tbody>
       </table>
     </div>

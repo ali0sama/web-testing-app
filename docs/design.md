@@ -51,7 +51,7 @@ Phase 1 delivers the architecture and a working prototype of the first stage, **
 
 The stored record holds:
 
-- **Inspection:** id, requested/final URL, title, scope, timestamp, DOM SHA-256 hash, screenshot, load and inspect times.
+- **Inspection:** id, requested/final URL, title, scope, timestamp, DOM SHA-256 hash, screenshot, load and inspect times, and `page_text[]` (visible text blocks `T001`…, each with tag and text).
 - **Per element:**
   - `element_id` (`E001`…), tag, type, implicit/explicit role, accessible name, label, text
   - attributes (`id`, `name`, `placeholder`, `aria-label`, `data-testid`, `href`, …), visible, bounding box, CSS path
@@ -71,9 +71,10 @@ A full example is in `samples/sample_inspection.json`.
    - The prompt contains only stored element data.
    - Every `element_id` in the answer is checked against the inspection. Invented ones are marked "NOT observed".
    - The locator shown next to a suggestion is always the **observed** one, never text written by the model.
-3. **Observations vs. assumptions.** The model must put business-rule guesses in `assumptions` and ask `clarifying_questions` when expected behavior is unknown. The UI shows both to the tester.
-4. **Prompt injection.** Page text is wrapped in `<page_data>` and the system prompt states that it is untrusted data. The UI never renders page text as HTML.
-5. **Approval integrity.** The model can only be called with a `preview_hash` matching the exact prompt the tester saw. If the selection or goal changed, the tester must approve again.
+3. **Grounded test data.** The inspection also stores the page's visible text (headings, paragraphs, labels, list items, alerts) as `page_text` blocks `T001`…, which are sent to the model as untrusted data. A suggested test value must come from the tester's goal or this page text; otherwise the model must use a `<placeholder>` and ask. The validator checks every value and labels it `goal`, `page_text`, `placeholder` or `unverified`. Unverified values (for example, values the model knows about a public site from its training data) are flagged for the tester.
+4. **Observations vs. assumptions.** The model must put business-rule guesses in `assumptions` and ask `clarifying_questions` when expected behavior is unknown. The UI shows both to the tester.
+5. **Prompt injection.** Page content is wrapped in `<page_data>` and `<page_text>`, and the system prompt states that it is untrusted data. The UI never renders page text as HTML.
+6. **Approval integrity.** The model can only be called with a `preview_hash` matching the exact prompt the tester saw. If the selection or goal changed, the tester must approve again.
 
 ## 5. Approval gates (whole project)
 
@@ -108,7 +109,8 @@ A full example is in `samples/sample_inspection.json`.
 | Timing | Model response time is measured around the API call only. Browser load and inspection times are measured and shown separately. A session average is displayed. |
 | Free-tier limits | Groq enforces per-minute and per-day limits on requests and tokens (see your account at console.groq.com/settings/limits). One Phase 1 call is about 1–2 k tokens, far below them. A rate-limit error is shown to the tester and logged as a failed call. |
 | Local hardware (dev machine) | Intel Core i7-13650HX (14 cores), 16 GB RAM, Windows 11. Only Chromium and the app run locally; the model runs at Groq. |
-| Software | Python 3.12, FastAPI, Playwright 1.65 (Chromium), SQLite. Versions are pinned in `requirements.txt`. |
+| Software | Python 3.12+ (tested on 3.12 and 3.14.4), FastAPI, Playwright 1.65 (Chromium), SQLite. Versions are pinned in `requirements.txt`. |
+| Call evidence | Each call stores the exact messages sent, the raw response and the validated result (`model_calls` table and `data/model_usage_log.jsonl`), so any call can be reviewed later. |
 
 ## 8. Security and isolation
 
@@ -128,5 +130,5 @@ A full example is in `samples/sample_inspection.json`.
 - The accessible name and implicit role are computed by a simplified algorithm. Wrong guesses are caught by live validation (count 0), not silently trusted.
 - Elements inside iframes and shadow DOM are not yet extracted.
 - At most 200 elements per inspection; a scope selector should be used on large pages.
-- Highlighting works on the page currently open in the runner's browser. A stored inspection loaded from history is not re-opened automatically.
+- Highlighting works on the page currently open in the runner's browser. A stored inspection loaded from history is not re-opened automatically; if the browser shows a different page, highlighting is refused (the runner compares the page URL with the inspection's URL) instead of marking an unrelated element.
 - Full-process isolation is used, not a container. A Docker runner is a possible Phase 2 upgrade.
