@@ -41,7 +41,7 @@ class Settings:
     def __init__(self):
         self.llm_provider = os.getenv("LLM_PROVIDER", "groq").strip().lower()
         self.groq_api_key = os.getenv("GROQ_API_KEY", "").strip()
-        self.groq_model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
+        self.groq_model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip()
         self.ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1").strip()
         self.ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:7b").strip()
 

@@ -66,7 +66,7 @@ python -m pytest
 | Setting | Default |
 |---|---|
 | `LLM_PROVIDER` | `groq` (free tier). `ollama` is also supported for local models. |
-| `GROQ_MODEL` | `llama-3.3-70b-versatile` |
+| `GROQ_MODEL` | `openai/gpt-oss-120b` |
 | `OLLAMA_MODEL` | `qwen2.5:7b` (requires `ollama pull qwen2.5:7b`) |
 
 No paid API is used. Token counts come from the provider's `usage` field. Anything estimated is labeled `estimate`.

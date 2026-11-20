@@ -48,7 +48,7 @@ flowchart LR
         C3[extract_elements.js<br/>read-only]
     end
 
-    LLM[(Groq free tier<br/>llama-3.3-70b-versatile<br/>or local Ollama)]
+    LLM[(Groq free tier<br/>openai/gpt-oss-120b<br/>or local Ollama)]
     WEB[(Target website)]
 
     UI -- REST/JSON --> B1
@@ -163,7 +163,7 @@ A full example is in `samples/sample_inspection.json`.
 | Item | Value |
 |---|---|
 | Provider | Groq API, **free tier** (no paid API) |
-| Model | `llama-3.3-70b-versatile` (set by `GROQ_MODEL` in `.env`) |
+| Model | `openai/gpt-oss-120b` (set by `GROQ_MODEL` in `.env`) |
 | Settings | temperature 0.2, JSON response mode, `max_retries=0` so the measured latency is one real call, 60 s timeout |
 | Alternative | Local Ollama (`qwen2.5:7b`) via `LLM_PROVIDER=ollama`, same code |
 | Token counts | Taken from the provider's `usage` field (labeled `provider`). If missing, estimated as chars/4 (labeled `estimate`). The prompt preview always shows an estimate, clearly labeled. |
