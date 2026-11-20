@@ -35,6 +35,21 @@ HIGHLIGHT_JS = """el => {
 }"""
 
 
+class ScopeError(ValueError):
+    """The tester's scope selector is invalid or matches nothing (a user input error)."""
+
+
+class WrongPageError(RuntimeError):
+    """The browser is not showing the page a stored inspection came from."""
+
+
+def same_page(url_a: str, url_b: str) -> bool:
+    """Compare two URLs, ignoring the #fragment and a trailing slash."""
+    def normalize(url: str) -> str:
+        return (url or "").split("#", 1)[0].rstrip("/")
+    return normalize(url_a) == normalize(url_b)
+
+
 class BrowserSession:
     def __init__(self):
         self.playwright = None
@@ -150,7 +165,7 @@ def handle_inspect(session: BrowserSession, args: dict):
         "maxElements": MAX_ELEMENTS,
     })
     if result.get("error"):
-        raise ValueError(result["error"])
+        raise ScopeError(result["error"])
 
     # Validate every candidate locator against the live page (uniqueness).
     for number, element in enumerate(result["elements"], start=1):
@@ -185,6 +200,13 @@ def handle_inspect(session: BrowserSession, args: dict):
 
 def handle_highlight(session: BrowserSession, args: dict):
     page = session.get_page()
+    # A stored inspection's locators are only meaningful on the page they came
+    # from; otherwise a locator like "#username" could mark an unrelated element.
+    expected_url = args.get("expected_url")
+    if expected_url and not same_page(page.url, expected_url):
+        raise WrongPageError(
+            f"The browser shows {page.url or 'no page'}, but this inspection came from {expected_url}"
+        )
     locator = to_locator(page, args["locator"])
     count = locator.count()
     if count == 0:
@@ -227,7 +249,11 @@ def main():
                     raise ValueError(f"Unknown command: {command}")
                 reply = {"ok": True, "data": handler(session, message.get("args") or {})}
         except Exception as exc:
-            reply = {"ok": False, "error": f"{type(exc).__name__}: {str(exc).splitlines()[0] if str(exc) else ''}"}
+            reply = {
+                "ok": False,
+                "error": f"{type(exc).__name__}: {str(exc).splitlines()[0] if str(exc) else ''}",
+                "error_type": type(exc).__name__,  # lets the app map user errors to HTTP 4xx
+            }
         reply["id"] = message.get("id") if isinstance(message, dict) else None
         # ensure_ascii keeps stdout plain ASCII, avoiding Windows encoding issues.
         sys.stdout.write(json.dumps(reply) + "\n")

@@ -35,7 +35,11 @@
       return false;
     }
     const rect = el.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0;
+    if (rect.width <= 0 || rect.height <= 0) return false;
+    // Positioned entirely above or left of the page (e.g. a "skip to content"
+    // link parked at top: -160px until focused): a user cannot see it.
+    if (rect.bottom + window.scrollY <= 0 || rect.right + window.scrollX <= 0) return false;
+    return true;
   }
 
   // Implicit ARIA role for common elements. The Python side verifies every
@@ -191,6 +195,32 @@
     });
   }
 
+  // Visible text the tester can read (headings, instructions, messages).
+  // Lets later steps ground expected results and test data in what the page
+  // actually says. Only visible text is kept; it is DATA, never instructions.
+  const TEXT_SELECTOR = [
+    "h1", "h2", "h3", "h4", "h5", "h6", "p", "label", "legend", "caption", "figcaption",
+    "li", "dt", "dd", "th", "[role=alert]", "[role=status]",
+  ].join(",");
+  const MAX_TEXT_BLOCKS = 60;
+  const pageText = [];
+  const seenText = new Set();
+  for (const block of root.querySelectorAll(TEXT_SELECTOR)) {
+    if (pageText.length >= MAX_TEXT_BLOCKS) break;
+    // Skip a block that contains another text block (avoids duplicates such
+    // as an <li> wrapping a <p>); the inner block is collected on its own.
+    if (block.querySelector(TEXT_SELECTOR)) continue;
+    if (!isVisible(block)) continue;
+    const text = clean(block.innerText || block.textContent, 300);
+    if (!text || seenText.has(text)) continue;
+    seenText.add(text);
+    pageText.push({
+      text_id: "T" + String(pageText.length + 1).padStart(3, "0"),
+      tag: block.tagName.toLowerCase(),
+      text: text,
+    });
+  }
+
   return {
     page_url: window.location.href,
     title: document.title,
@@ -199,5 +229,6 @@
     hidden_skipped: hiddenSkipped,
     truncated: found.length - hiddenSkipped > elements.length,
     elements: elements,
+    page_text: pageText,
   };
 }

@@ -18,13 +18,16 @@ The current version is **Phase 1**: guided inspection plus one approved model ca
   - highlight an element in the real browser,
   - reload stored inspections.
 - **Model call with approval.** The tester writes a testing goal, previews the **exact** prompt, and approves it. Only then is the model called.
-- **Grounding check.** Answers are checked against the observed elements. Invented elements are flagged.
-- **Usage log.** Every model call is logged with model, prompt/completion tokens (from the provider), response time, and the session average.
+- **Grounding check.** Answers are checked against the observed elements. Invented elements are flagged. Suggested test data must come from the tester's goal or the page's visible text (also captured during inspection); anything else is flagged as not observed.
+- **Usage log.** Every model call is logged with model, prompt/completion tokens (from the provider), response time, and the session average. The exact prompt sent, the raw response and the validated result are stored too (**Details** link in the usage table, or `GET /api/model-calls/{id}`).
 
 ## Setup (Windows PowerShell)
 
+Requires **Python 3.12 or newer** (tested on 3.12 and 3.14.4).
+
+Open PowerShell in the project folder (the one containing `requirements.txt`), then run:
+
 ```powershell
-cd "D:\Uni Semester 7\Gen AI\Project\web-testing-assistant"
 python -m venv .venv                      # skip if .venv already exists
 # If activation is blocked, run this once:
 #   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
@@ -85,9 +88,9 @@ data/       runtime data: SQLite DB, screenshots, logs (not committed)
 
 ## Generated data
 
-- `data/app.db`: inspections, elements, model calls.
+- `data/app.db`: inspections, elements, model calls (including prompt, raw response and validated result).
 - `data/screenshots/`: one full-page screenshot per inspection.
-- `data/model_usage_log.jsonl`: one line per model call (copy it to `samples/` as evidence).
+- `data/model_usage_log.jsonl`: one line per model call, with metrics, the exact messages sent and the raw response (copy it to `samples/` as evidence).
 - `data/runner_stderr.log`: diagnostic output from the runner.
 
 ## Limitations

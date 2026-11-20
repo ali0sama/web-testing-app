@@ -18,7 +18,9 @@ SECRET_WORDS = ("KEY", "TOKEN", "SECRET", "PASSWORD")
 
 
 class RunnerError(Exception):
-    pass
+    def __init__(self, message: str, error_type: str = None):
+        super().__init__(message)
+        self.error_type = error_type  # exception class name reported by the runner, if any
 
 
 def safe_environment() -> dict:
@@ -99,7 +101,7 @@ class RunnerClient:
             if reply.get("id") != message_id:
                 continue
             if not reply.get("ok"):
-                raise RunnerError(reply.get("error") or "Unknown runner error")
+                raise RunnerError(reply.get("error") or "Unknown runner error", reply.get("error_type"))
             return reply.get("data")
 
     def call(self, command: str, args: dict = None, timeout: float = None):
