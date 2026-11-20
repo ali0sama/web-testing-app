@@ -1,0 +1,327 @@
+{
+  "id": 2,
+  "session_id": "c60c9146ac19",
+  "requested_url": "https://the-internet.herokuapp.com/login",
+  "final_url": "https://the-internet.herokuapp.com/login",
+  "title": "The Internet",
+  "scope": null,
+  "include_hidden": false,
+  "created_at": "2026-11-20T08:23:30+00:00",
+  "dom_hash": "29d96868e1a8aaa5bfc88f27dbab87253d2fd94c2aedace66a28f3ef6e916326",
+  "screenshot": "inspection_2157ae2b8b.png",
+  "element_count": 7,
+  "total_matched": 8,
+  "hidden_skipped": 1,
+  "load_ms": 6818,
+  "inspect_ms": 174,
+  "elements": [
+    {
+      "tag": "a",
+      "type": null,
+      "role": "link",
+      "name": "Skip to content",
+      "label": "",
+      "text": "Skip to content",
+      "attributes": {
+        "href": "#content",
+        "class": "skip-link"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 16,
+        "y": -160,
+        "width": 146,
+        "height": 32
+      },
+      "css_path": "body > a:nth-of-type(1)",
+      "element_id": "E001",
+      "locators": [
+        {
+          "kind": "role",
+          "role": "link",
+          "value": "Skip to content",
+          "code": "page.get_by_role(\"link\", name=\"Skip to content\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "text",
+          "value": "Skip to content",
+          "code": "page.get_by_text(\"Skip to content\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "css",
+          "value": "body > a:nth-of-type(1)",
+          "code": "page.locator(\"body > a:nth-of-type(1)\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_role(\"link\", name=\"Skip to content\", exact=True)"
+    },
+    {
+      "tag": "a",
+      "type": null,
+      "role": "link",
+      "name": "The Internet: home",
+      "label": "",
+      "text": "",
+      "attributes": {
+        "href": "/",
+        "aria-label": "The Internet: home",
+        "class": "home-link"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 196,
+        "height": 70
+      },
+      "css_path": "body > a:nth-of-type(2)",
+      "element_id": "E002",
+      "locators": [
+        {
+          "kind": "role",
+          "role": "link",
+          "value": "The Internet: home",
+          "code": "page.get_by_role(\"link\", name=\"The Internet: home\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "css",
+          "value": "body > a:nth-of-type(2)",
+          "code": "page.locator(\"body > a:nth-of-type(2)\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_role(\"link\", name=\"The Internet: home\", exact=True)"
+    },
+    {
+      "tag": "input",
+      "type": "text",
+      "role": "textbox",
+      "name": "Username",
+      "label": "Username",
+      "text": "",
+      "attributes": {
+        "id": "username",
+        "name": "username",
+        "type": "text"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 156,
+        "y": 334,
+        "width": 469,
+        "height": 32
+      },
+      "css_path": "#username",
+      "element_id": "E003",
+      "locators": [
+        {
+          "kind": "role",
+          "role": "textbox",
+          "value": "Username",
+          "code": "page.get_by_role(\"textbox\", name=\"Username\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "label",
+          "value": "Username",
+          "code": "page.get_by_label(\"Username\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "id",
+          "value": "#username",
+          "code": "page.locator(\"#username\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_role(\"textbox\", name=\"Username\", exact=True)"
+    },
+    {
+      "tag": "input",
+      "type": "password",
+      "role": null,
+      "name": "Password",
+      "label": "Password",
+      "text": "",
+      "attributes": {
+        "id": "password",
+        "name": "password",
+        "type": "password"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 156,
+        "y": 397,
+        "width": 469,
+        "height": 32
+      },
+      "css_path": "#password",
+      "element_id": "E004",
+      "locators": [
+        {
+          "kind": "label",
+          "value": "Password",
+          "code": "page.get_by_label(\"Password\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "id",
+          "value": "#password",
+          "code": "page.locator(\"#password\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_label(\"Password\", exact=True)"
+    },
+    {
+      "tag": "button",
+      "type": "submit",
+      "role": "button",
+      "name": "Login",
+      "label": "",
+      "text": "Login",
+      "attributes": {
+        "type": "submit",
+        "class": "radius"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 156,
+        "y": 443,
+        "width": 164,
+        "height": 59
+      },
+      "css_path": "#login > button",
+      "element_id": "E005",
+      "locators": [
+        {
+          "kind": "role",
+          "role": "button",
+          "value": "Login",
+          "code": "page.get_by_role(\"button\", name=\"Login\", exact=True)",
+          "count": 0,
+          "status": "none"
+        },
+        {
+          "kind": "text",
+          "value": "Login",
+          "code": "page.get_by_text(\"Login\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "css",
+          "value": "#login > button",
+          "code": "page.locator(\"#login > button\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_text(\"Login\", exact=True)"
+    },
+    {
+      "tag": "a",
+      "type": null,
+      "role": "link",
+      "name": "Elemental Selenium",
+      "label": "",
+      "text": "Elemental Selenium",
+      "attributes": {
+        "href": "https://elementalselenium.com/"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 565,
+        "y": 590,
+        "width": 123,
+        "height": 18
+      },
+      "css_path": "#page-footer > div > div > a:nth-of-type(1)",
+      "element_id": "E006",
+      "locators": [
+        {
+          "kind": "role",
+          "role": "link",
+          "value": "Elemental Selenium",
+          "code": "page.get_by_role(\"link\", name=\"Elemental Selenium\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "text",
+          "value": "Elemental Selenium",
+          "code": "page.get_by_text(\"Elemental Selenium\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "css",
+          "value": "#page-footer > div > div > a:nth-of-type(1)",
+          "code": "page.locator(\"#page-footer > div > div > a:nth-of-type(1)\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_role(\"link\", name=\"Elemental Selenium\", exact=True)"
+    },
+    {
+      "tag": "a",
+      "type": null,
+      "role": "link",
+      "name": "Sauce Labs",
+      "label": "",
+      "text": "Sauce Labs",
+      "attributes": {
+        "href": "https://saucelabs.com/"
+      },
+      "visible": true,
+      "bbox": {
+        "x": 719,
+        "y": 590,
+        "width": 71,
+        "height": 18
+      },
+      "css_path": "#page-footer > div > div > a:nth-of-type(2)",
+      "element_id": "E007",
+      "locators": [
+        {
+          "kind": "role",
+          "role": "link",
+          "value": "Sauce Labs",
+          "code": "page.get_by_role(\"link\", name=\"Sauce Labs\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "text",
+          "value": "Sauce Labs",
+          "code": "page.get_by_text(\"Sauce Labs\", exact=True)",
+          "count": 1,
+          "status": "unique"
+        },
+        {
+          "kind": "css",
+          "value": "#page-footer > div > div > a:nth-of-type(2)",
+          "code": "page.locator(\"#page-footer > div > div > a:nth-of-type(2)\")",
+          "count": 1,
+          "status": "unique"
+        }
+      ],
+      "recommended_locator": "page.get_by_role(\"link\", name=\"Sauce Labs\", exact=True)"
+    }
+  ]
+}

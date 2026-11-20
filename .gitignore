@@ -1,0 +1,23 @@
+# Python virtual environment (each person creates their own)
+.venv/
+
+# Real secrets - NEVER commit. Use .env.example as the template.
+.env
+
+# Runtime data: SQLite database, screenshots, runner logs
+data/
+
+# Python / pytest caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Playwright output (Phase 2)
+test-results/
+playwright-report/
+
+# Editor / OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Testing Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>Web Testing Assistant</h1>
+  <div id="model-info" class="muted"></div>
+</header>
+
+<main>
+  <!-- 1. Target and inspection scope -->
+  <section class="card">
+    <h2>1. Inspect a page</h2>
+    <div class="row">
+      <label class="grow">URL
+        <input id="url" type="url" placeholder="https://...">
+      </label>
+      <label>Scope (optional CSS selector)
+        <input id="scope" type="text" placeholder="e.g. form#login">
+      </label>
+      <label class="inline"><input id="include-hidden" type="checkbox"> include hidden</label>
+      <button id="inspect-btn" class="primary">Open &amp; Inspect</button>
+    </div>
+    <div id="allowed-hosts" class="muted small"></div>
+    <div class="row small">
+      <label>Previous inspections
+        <select id="history"><option value="">-- load a stored inspection --</option></select>
+      </label>
+    </div>
+    <div id="inspect-status" class="status"></div>
+  </section>
+
+  <!-- 2. Findings -->
+  <section class="card" id="findings-card" hidden>
+    <h2>2. Findings</h2>
+    <div id="inspection-meta" class="meta"></div>
+    <div class="row">
+      <input id="filter" type="text" placeholder="Filter by text, role, id...">
+      <button id="select-all">Select shown</button>
+      <button id="select-none">Clear selection</button>
+      <a id="export-link" href="#" download>Export JSON</a>
+      <a id="screenshot-link" href="#" target="_blank">Screenshot</a>
+      <span id="selection-count" class="muted"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th></th><th>ID</th><th>Element</th><th>Name / label</th><th>Attributes</th><th>Candidate locators (live match count)</th><th></th></tr>
+        </thead>
+        <tbody id="elements-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. Goal + approval gate -->
+  <section class="card" id="goal-card" hidden>
+    <h2>3. Testing goal</h2>
+    <textarea id="goal" rows="3" placeholder="e.g. Verify that a user can log in with valid credentials and sees an error with invalid ones."></textarea>
+    <div class="row">
+      <button id="preview-btn">Preview what will be sent</button>
+      <span class="muted small">No selection = all observed elements are sent.</span>
+    </div>
+    <div id="preview-box" hidden>
+      <div id="preview-meta" class="meta"></div>
+      <pre id="preview-text"></pre>
+      <div class="row">
+        <button id="approve-btn" class="primary">Approve &amp; send to model</button>
+        <button id="cancel-btn">Cancel</button>
+      </div>
+    </div>
+    <div id="assist-status" class="status"></div>
+  </section>
+
+  <!-- 4. Model result -->
+  <section class="card" id="result-card" hidden>
+    <h2>4. Assistant suggestion</h2>
+    <div id="result-meta" class="meta"></div>
+    <h3>Summary</h3>
+    <p id="result-summary"></p>
+    <h3>Suggested next actions</h3>
+    <table>
+      <thead><tr><th>Element</th><th>Grounded?</th><th>Action</th><th>Observed locator</th><th>Reason</th><th>Test data hint</th></tr></thead>
+      <tbody id="actions-body"></tbody>
+    </table>
+    <div class="two-col">
+      <div><h3>Assumptions (confirm these)</h3><ul id="assumptions"></ul></div>
+      <div><h3>Clarifying questions</h3><ul id="questions"></ul></div>
+    </div>
+    <div id="validation" class="warning" hidden></div>
+    <details><summary>Raw model output</summary><pre id="raw-output"></pre></details>
+  </section>
+
+  <!-- 5. Model usage -->
+  <section class="card">
+    <h2>Model usage</h2>
+    <div id="session-stats" class="meta"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Time (UTC)</th><th>Provider / model</th><th>Prompt tok</th><th>Completion tok</th><th>Total</th><th>Token source</th><th>Response time</th><th>Status</th></tr></thead>
+        <tbody id="calls-body"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
